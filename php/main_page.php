@@ -1,21 +1,35 @@
 <?php
-require '../db/db_connection.php'; // Include the DB connection
+require '../db/db_connection.php'; // DB connection
 
-// Start a session to manage user login
+// Manage user login
 session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    header('Location: login.php'); // Redirect to register page if not logged in
+    header('Location: login.php');
     exit;
+}
+
+
+// For Logout method
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Dummy check for username and password
+    if ($username === 'user' && $password === 'password') {
+        $_SESSION['loggedin'] = true;
+        header("Location: dashboard.php"); // Redirect to a dashboard or other page
+        exit();
+    } else {
+        $error = "Invalid login credentials";
+    }
 }
 
 // Fetch user playlists or other data if needed
 $username = $_SESSION['username'];
-// Example query to fetch user's playlists (adjust according to your database structure)
-// $playlists = $conn->query("SELECT * FROM playlists WHERE username = '$username'");
 
-// For demonstration, we will use a static playlist array
+//Static playlist array
 $playlists = [
     ['title' => 'Chill Vibes', 'songs' => ['Song 1', 'Song 2', 'Song 3']],
     ['title' => 'Top Hits', 'songs' => ['Hit 1', 'Hit 2', 'Hit 3']],
@@ -28,7 +42,7 @@ $playlists = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page - Spotify Style</title>
+    <title>Main Page</title>
     <style>
         * {
             margin: 0;
@@ -138,9 +152,8 @@ $playlists = [
         <div class="logo">MyMusic</div>
         <nav class="nav">
             <a href="#">Home</a>
-            <a href="#">Library</a>
-            <a href="#">Profile</a>
-            <a href="register.php">Logout</a>
+            <a onclick="location.href='profile.php'">Profile</a>
+            <a onclick="location.href='logout.php'">Logout</a>
         </nav>
     </div>
 
@@ -157,7 +170,7 @@ $playlists = [
             </div>
         <?php endforeach; ?>
 
-        <button class="logout-btn" onclick="location.href='login.php'">Logout</button>
+        <button class="logout-btn" onclick="location.href='logout.php'">Logout</button>
     </div>
 
 </body>

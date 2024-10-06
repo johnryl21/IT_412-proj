@@ -6,6 +6,8 @@ $pepper = "pepper_string"; // Static Pepper
 $error = ''; // Variable to hold error message
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $firstname = $_POST['firstname'];
+    $lastname = $_POST['lastname'];
     $username = $_POST['username'];
     $password = $_POST['password'];
 
@@ -28,9 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Hash password with salt and pepper
             $hashedPassword = hash('sha256', $salt . $password . $pepper);
 
-            // Insert user into the database
-            $stmt = $conn->prepare("INSERT INTO users (username, password_hash, salt) VALUES (?, ?, ?)");
-            $stmt->bind_param('sss', $username, $hashedPassword, $salt);
+            // Insert user into the database, including first and last names
+            $stmt = $conn->prepare("INSERT INTO users (firstname, lastname, username, password_hash, salt) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param('sssss', $firstname, $lastname, $username, $hashedPassword, $salt);
 
             if ($stmt->execute()) {
                 $_SESSION['username'] = $username; // Set session variable
@@ -48,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $conn->close();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Spotify Style</title>
+    <title>Sign Up</title>
     <style>
         * {
             margin: 0;
@@ -175,6 +178,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <form method="POST" action="register.php">
             <div class="input-group">
+                <label for="firstname">First Name</label>
+                <input type="text" id="firstname" name="firstname" placeholder="Enter your first name" required>
+            </div>
+            <div class="input-group">
+                <label for="lastname">Last Name</label>
+                <input type="text" id="lastname" name="lastname" placeholder="Enter your last name" required>
+            </div>
+            <div class="input-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="Enter your username or email" required>
             </div>
@@ -189,8 +200,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <br>
             <button type="submit" class="submit-btn">Sign Up</button>
         </form>
+
         <div class="extra-info">
             By signing up, you agree to our <a href="#">Terms and Conditions</a>.
+        </div>
+        <div class="extra-info">
+            Already have an Account? <a href="login.php">Go to Login</a>
         </div>
     </div>
 
