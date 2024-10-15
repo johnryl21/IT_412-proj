@@ -4,6 +4,7 @@ require '../db/db_connection.php'; // Include the DB connection
 session_start(); // Start the session
 $pepper = "pepper_string"; // Static Pepper
 $error = ''; // Variable to hold error message
+$strength = ''; // Variable to hold password strength
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $firstname = $_POST['firstname'];
@@ -14,7 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Password validation: must contain letters, numbers, and symbols
     if (!preg_match('/[A-Za-z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[^A-Za-z0-9]/', $password)) {
         $error = "Password must contain at least one letter, one number, and one special character.";
+        $strength = 'weak'; // Set strength to weak
     } else {
+        // Check the strength of the password
+        if (strlen($password) >= 8) {
+            $strength = 'strong';
+        } elseif (strlen($password) >= 5) {
+            $strength = 'medium';
+        } else {
+            $strength = 'weak';
+        }
+
         // Check if the username already exists
         $checkStmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
         $checkStmt->bind_param('s', $username);
@@ -50,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $conn->close();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -123,7 +133,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             display: flex;
             align-items: center;
             margin-top: 10px;
-            /* Add some spacing above the checkbox */
         }
 
         .submit-btn {
@@ -163,6 +172,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 20px;
             font-size: 14px;
         }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            /* Light grey background */
+            border-radius: 5px;
+            margin: 10px 0;
+            height: 8px;
+            /* Adjust the height here */
+        }
+
+        .progress-bar {
+            height: 100%;
+            /* Full height of the container */
+            border-radius: 5px;
+            text-align: center;
+            line-height: 8px;
+            /* Adjusted to match the new height */
+            font-size: 12px;
+            /* Smaller font size for thinner bar */
+        }
+
+        .weak {
+            background-color: #1DB954;
+            /* Spotify Green */
+        }
+
+        .medium {
+            background-color: #FFD700;
+            /* Yellow */
+            color: black;
+        }
+
+        .strong {
+            background-color: #FF3838;
+            /* A brighter red */
+        }
     </style>
 </head>
 
@@ -170,12 +216,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <div class="registration-container">
         <h2>Sign Up for Free</h2>
-
         <!-- Show the error message if it exists -->
         <?php if ($error): ?>
             <div class="error-message"><?php echo $error; ?></div>
         <?php endif; ?>
-
         <form method="POST" action="register.php">
             <div class="input-group">
                 <label for="firstname">First Name</label>
@@ -192,6 +236,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="input-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <!-- Password Strength Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-bar <?php echo $strength; ?>" id="password-strength-bar" style="width: 0%;">
+                    <!-- Initial state, will be updated by JavaScript -->
+                </div>
             </div>
             <div class="show-password">
                 <input type="checkbox" id="show-password">
@@ -213,13 +263,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Show/Hide Password functionality
         const passwordField = document.getElementById('password');
         const showPasswordCheckbox = document.getElementById('show-password');
+        const passwordStrengthBar = document.getElementById('password-strength-bar');
 
         showPasswordCheckbox.addEventListener('change', function () {
-            if (this.checked) {
-                passwordField.type = 'text';
-            } else {
-                passwordField.type = 'password';
+            passwordField.type = this.checked ? 'text' : 'password';
+        });
+
+        passwordField.addEventListener('input', function () {
+            const password = this.value;
+            let strength = 'weak';
+            let width = '0%';
+
+            // Check password strength
+            if (password.length >= 8 && /[A-Za-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) {
+                strength = 'strong';
+                width = '100%';
+            } else if (password.length >= 5) {
+                strength = 'medium';
+                width = '60%';
+            } else if (password.length > 0) {
+                strength = 'weak';
+                width = '30%';
             }
+
+            // Update progress bar style
+            passwordStrengthBar.className = 'progress-bar ' + strength;
+            passwordStrengthBar.style.width = width;
+            passwordStrengthBar.textContent = strength.charAt(0).toUpperCase() + strength.slice(1); // Capitalize first letter
         });
     </script>
 
