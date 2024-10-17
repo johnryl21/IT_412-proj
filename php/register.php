@@ -255,7 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             By signing up, you agree to our <a href="#">Terms and Conditions</a>.
         </div>
         <div class="extra-info">
-            Already have an Account? <a href="index.php">Go to Login</a>
+            Already have an Account? <a href="login.php">Go to Login</a>
         </div>
     </div>
 
