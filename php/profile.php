@@ -1,5 +1,5 @@
 <?php
-require '../db/db_connection.php'; // Include the DB connection
+require 'db_connection.php'; // Include the DB connection
 session_start(); // Start the session
 
 if (!isset($_SESSION['username'])) {

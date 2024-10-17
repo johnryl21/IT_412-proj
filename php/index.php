@@ -1,5 +1,5 @@
 <?php
-require '../db/db_connection.php'; // Include the DB connection
+require 'db_connection.php'; // Include the DB connection
 
 session_start(); // Start the session
 $pepper = "pepper_string"; // Static Pepper
@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="error-message"><?php echo $error; ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="login.php">
+        <form method="POST" action="index.php">
             <div class="input-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="Enter your username or email" required>

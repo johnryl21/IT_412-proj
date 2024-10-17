@@ -1,12 +1,12 @@
 <?php
-require '../db/db_connection.php'; // DB connection
+require 'db_connection.php'; // DB connection
 
 // Manage user login
 session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    header('Location: login.php');
+    header('Location: index.php');
     exit;
 }
 
