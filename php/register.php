@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($result->num_rows > 0) {
             $error = "This username is already registered.";
         } else {
-            // Generate a random salt
+            // Generate random salt
             $salt = bin2hex(random_bytes(32));
 
             // Hash password with salt and pepper
